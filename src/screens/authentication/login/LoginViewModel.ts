@@ -1,10 +1,10 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { login } from '../../../redux/authSlice';
 import { ApiService } from '../../../api/ApiService';
 import WSCall from '../../../api/ApiClient';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
+import { setLoading } from '../../../redux/appSlice';
 
 interface User {
   username: string;
@@ -16,16 +16,12 @@ interface LoginResponse {
 }
 
 export default function useLoginViewModel(navigation: any) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
 
   const handleLogin = useCallback(
     async (email: string, password: string) => {
       try {
-        setIsLoading(true);
-        setError(null);
-
+        dispatch(setLoading(true));
         const userData: User = {
           username: email,
           password: password,
@@ -47,9 +43,6 @@ export default function useLoginViewModel(navigation: any) {
           );
         });
 
-        // Save token to AsyncStorage
-        await AsyncStorage.setItem('access_token', response.token);
-
         // Dispatch login success action
         dispatch(
           login({
@@ -60,36 +53,15 @@ export default function useLoginViewModel(navigation: any) {
         // Navigate to main app
         navigation.replace('MainTabs');
       } catch (err: any) {
-        console.error('Login error:', err);
-        setError(err.message || 'Login failed. Please try again.');
         Alert.alert('Error', err.message || 'Login failed. Please try again.');
       } finally {
-        setIsLoading(false);
+        dispatch(setLoading(false));
       }
     },
     [dispatch, navigation],
   );
 
-  const checkAuthStatus = useCallback(async () => {
-    try {
-      const token = await AsyncStorage.getItem('access_token');
-      console.log('Token:', token);
-      if (token) {
-        // Here you might want to validate the token with your backend
-        // For now, we'll just check if it exists
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Error checking auth status:', error);
-      return false;
-    }
-  }, []);
-
   return {
     handleLogin,
-    checkAuthStatus,
-    isLoading,
-    error,
   };
 }

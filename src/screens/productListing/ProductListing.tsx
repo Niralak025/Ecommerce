@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { FlatList, Image, Pressable, StyleSheet, View } from 'react-native';
 import AppText from '../../components/common/appText/AppText';
-import { useSelector } from 'react-redux';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useProductListing } from './ProductListingViewModel';
 import { Product } from '../../type/ProductTypes';
@@ -16,10 +15,7 @@ type ProductListingNavigationProp = {
 const ProductListing: React.FC<ProductListingNavigationProp> = (
   props,
 ): React.JSX.Element => {
-  const [productData, setProductData] = useState<Product[]>([]);
-  const wishlistItems = useSelector((state: any) => state.cart.wishlistItems);
-  const { products, isLoading, error, refreshProducts, getProducts } =
-    useProductListing();
+  const { products, getProducts } = useProductListing();
 
   useEffect(() => {
     getProducts();
@@ -80,10 +76,8 @@ const styles = StyleSheet.create({
   },
   imageStyle: {
     flex: 1,
-    // width: 100,
     height: 100,
     borderRadius: 10,
-    // alignSelf: 'center',
   },
   titleStyle: {
     fontSize: 16,

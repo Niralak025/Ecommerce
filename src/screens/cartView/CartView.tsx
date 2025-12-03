@@ -1,22 +1,13 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, StyleSheet, FlatList, Image } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import AppText from '../../components/common/appText/AppText';
 import { CartNavigatorStackParamList } from '../../navigators/CartNavigator';
-import { useSelector } from 'react-redux';
 import Button from '../../components/common/button/Button';
 import { CartItem } from '../../type/CartTypes';
 import { palette } from '../../shared/theme';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-interface CheckoutViewProps {
+import useCartViewModel from './CartViewModel';
+export interface CheckoutViewProps {
   navigation: NativeStackNavigationProp<
     CartNavigatorStackParamList,
     'orderHistory'
@@ -24,45 +15,11 @@ interface CheckoutViewProps {
 }
 
 const CartView: React.FC<CheckoutViewProps> = props => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<CartNavigatorStackParamList>>();
-  const itemInCart = useSelector((state: any) => state.cart.cartItems);
-  console.log('itemInCart', itemInCart);
-  const totalAmount = useSelector((state: any) => state.cart.totalAmount);
-  console.log('totalAmount', totalAmount);
-  const totalItems = useSelector((state: any) => state.cart.totalItems);
-  console.log('totalItems', totalItems);
-
-  const ORDERS_KEY = 'user_orders';
-  const handlePlaceOrder = async () => {
-    try {
-      console.log('Place Order');
-      const orderDetailsObject = {
-        id: Math.random().toString(),
-        total_price: totalAmount,
-        items: itemInCart,
-        order_date: new Date().toISOString(),
-      };
-      console.log('orderDetailsObject', orderDetailsObject);
-      const existingOrders = await AsyncStorage.getItem(ORDERS_KEY);
-      const parsedOrders = existingOrders ? JSON.parse(existingOrders) : [];
-      const updatedOrders = [orderDetailsObject, ...parsedOrders];
-      await AsyncStorage.setItem(ORDERS_KEY, JSON.stringify(updatedOrders));
-      props.navigation.navigate('orderHistory');
-      console.log('✅ Order saved successfully');
-    } catch (error) {
-      console.error('❌ Failed to save order:', error);
-    }
-  };
+  const { handlePlaceOrder, itemInCart, totalAmount } = useCartViewModel(props);
 
   const renderCheckoutItem = ({ item }: { item: CartItem }) => {
     return (
-      <TouchableOpacity
-        style={styles.orderCard}
-        onPress={() => {
-          console.log('Item pressed:', item);
-        }}
-      >
+      <View style={styles.orderCard}>
         <View style={styles.orderHeader}>
           <AppText style={styles.productTitle}>{item.title}</AppText>
           <AppText style={styles.productTitle}>{item.category}</AppText>
@@ -80,7 +37,7 @@ const CartView: React.FC<CheckoutViewProps> = props => {
             </AppText>
           </View>
         </View>
-      </TouchableOpacity>
+      </View>
     );
   };
 
@@ -110,7 +67,7 @@ const CartView: React.FC<CheckoutViewProps> = props => {
             onPress={() => {
               handlePlaceOrder();
             }}
-            buttonStyle={{ margin: 16, alignSelf: 'center' }}
+            buttonStyle={styles.buttonStyle}
           />
         </View>
       ) : null}
@@ -121,17 +78,12 @@ const CartView: React.FC<CheckoutViewProps> = props => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: palette.background,
   },
   productTitle: {
     fontSize: 12,
     fontWeight: '600',
     marginBottom: 4,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   emptyContainer: {
     flex: 1,
@@ -140,16 +92,16 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
+    color: palette.textMuted,
   },
   listContent: {
     padding: 16,
   },
   orderCard: {
-    backgroundColor: '#fff',
+    backgroundColor: palette.white,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: palette.cancel,
     marginBottom: 16,
     overflow: 'hidden',
   },
@@ -162,52 +114,6 @@ const styles = StyleSheet.create({
   },
   orderHeader: {
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
-  },
-  orderNumber: {
-    fontWeight: '600',
-    fontSize: 16,
-    marginBottom: 4,
-  },
-  orderDate: {
-    color: '#666',
-    fontSize: 14,
-  },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  itemsContainer: {
-    padding: 16,
-  },
-  itemRow: {
-    flexDirection: 'row',
-    marginBottom: 12,
-    alignItems: 'center',
-  },
-  productImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 4,
-    marginRight: 12,
-  },
-  itemDetails: {
-    flex: 1,
-  },
-  productName: {
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  productPrice: {
-    color: '#666',
-    fontSize: 14,
   },
   orderFooter: {
     flexDirection: 'row',
@@ -215,11 +121,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: '#f5f5f5',
+    borderTopColor: palette.cancel,
   },
   totalText: {
     fontWeight: '500',
     fontSize: 16,
+    color: palette.text,
+  },
+  buttonStyle: {
+    margin: 16,
+    alignSelf: 'center',
   },
 });
 

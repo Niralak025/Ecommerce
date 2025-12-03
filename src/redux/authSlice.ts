@@ -1,26 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-interface User {
-  uid?: string;
-  nickname?: string;
-  name?: string;
-  picture?: string;
-  email?: string;
-  emailVerified?: boolean;
-  creationTime?: string;
-  lastSignInTime?: string;
-}
-
 interface AuthState {
   isLoggedIn: boolean;
-  provider: 'auth0' | 'firebase' | null;
-  user: User | null;
+  token: string | null;
 }
 
 const initialState: AuthState = {
   isLoggedIn: false,
-  provider: null,
-  user: null,
+  token: null,
 };
 
 const authSlice = createSlice({
@@ -29,13 +16,11 @@ const authSlice = createSlice({
   reducers: {
     login(state, action) {
       state.isLoggedIn = true;
-      state.provider = action.payload.provider;
-      state.user = action.payload.user;
+      state.token = action.payload.token;
     },
     logout(state) {
       state.isLoggedIn = false;
-      state.provider = null;
-      state.user = null;
+      state.token = null;
     },
   },
 });

@@ -1,5 +1,4 @@
 import axiosInstance from './ApiInstance.tsx';
-
 interface ApiResponse {
   data: any;
 }
@@ -11,9 +10,6 @@ export default class WSCall {
     requestType: 'get' | 'post' = 'get',
     completion: (data: any, error: any) => void,
   ): Promise<void> {
-    const accessToken = '';
-    console.log('accessToken: ', accessToken);
-
     try {
       let response: ApiResponse | undefined;
 
@@ -22,7 +18,6 @@ export default class WSCall {
         response = await axiosInstance.post(apiName, params, {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
           },
         });
       } else {
@@ -31,7 +26,6 @@ export default class WSCall {
           params,
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
           },
         });
       }
@@ -55,8 +49,6 @@ export default class WSCall {
     requestType: 'get' | 'post' = 'get',
     completion: (data: any, error: any) => void,
   ): Promise<void> {
-    const accessToken = '';
-    console.log('accessToken from Redux store:', accessToken);
     try {
       let response: ApiResponse | undefined;
       if (requestType === 'post') {
@@ -64,7 +56,6 @@ export default class WSCall {
         response = await axiosInstance.post(apiName, params, {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
           },
         });
       } else {
@@ -73,7 +64,6 @@ export default class WSCall {
           params,
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
           },
         });
       }
@@ -94,12 +84,8 @@ export default class WSCall {
   static async postResponseUpload(
     apiName: string,
     params: Record<string, any> = {},
-    requestType: 'post',
     completion: (data: any, error: any) => void,
   ): Promise<void> {
-    const accessToken = ''; //TODO: get access token from redux store or local storage
-    console.log('accessToken: ', accessToken);
-
     console.log('📤 Sending Image Upload request:', apiName, params);
     try {
       let response: ApiResponse | undefined;
@@ -107,7 +93,6 @@ export default class WSCall {
       response = await axiosInstance.post(apiName, params, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${accessToken}`,
         },
         transformRequest: data => data,
       });

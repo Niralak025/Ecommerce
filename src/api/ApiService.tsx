@@ -3,5 +3,4 @@ export const ApiService = {
   AUTH: {
     LOGIN: 'auth/login',
   },
-  ADD_USER: 'users',
 };

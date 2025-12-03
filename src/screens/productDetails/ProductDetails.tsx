@@ -7,62 +7,46 @@ import {
   Dimensions,
   Pressable,
 } from 'react-native';
-import { RouteProp, useRoute } from '@react-navigation/native';
-import { useDispatch, useSelector } from 'react-redux';
 import AppText from '../../components/common/appText/AppText';
 import Button from '../../components/common/button/Button';
 import { palette } from '../../shared/theme';
-import {
-  addItemToCart,
-  removeItemFromCart,
-} from '../../redux/features/cart/cartSlice';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CartItem } from '../../type/CartTypes';
-import { HomeNavigatorStackParamList } from '../../navigators/HomeNavigator';
+import LoginModel from '../../components/projects/loginModel/LoginModel';
+import { RootStackParamList } from '../../navigators/RootNavigator';
+import { useProductDetails } from './ProductDetailsViewModel';
+import Header from '../../components/common/header/Header';
 
-type ProductDetailsRouteProp = {
-  params: {
-    product: CartItem;
+export type ProductDetailsRouteProp = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'MainTabs'>;
+  route: {
+    params: {
+      product: CartItem;
+    };
   };
-};
-
-type ProductDetailsNavigationProp = {
-  navigation: NativeStackNavigationProp<
-    HomeNavigatorStackParamList,
-    'productDetails'
-  >;
 };
 
 const { width } = Dimensions.get('window');
 
-const ProductDetails: React.FC<ProductDetailsNavigationProp> = props => {
-  const route = useRoute<RouteProp<ProductDetailsRouteProp, 'params'>>();
-  const { product } = route.params;
-  const dispatch = useDispatch();
-
-  const quantityInCart = useSelector(
-    (state: any) =>
-      state.cart.cartItems.find((item: any) => item.id === product.id)
-        ?.quantity,
-  );
-  const isUserLoggedIn = useSelector((state: any) => state.auth.isLoggedIn);
-
-  const handleAddToCart = () => {
-    // if (!isUserLoggedIn) {
-    //   props.navigation.navigate('Auth', {
-    //     screen: 'Login',
-    //   });
-    //   return;
-    // }
-    dispatch(addItemToCart(product));
-  };
-
-  const handleRemoveFromCart = () => {
-    dispatch(removeItemFromCart(product.id));
-  };
+const ProductDetails: React.FC<ProductDetailsRouteProp> = props => {
+  const {
+    handleAddToCart,
+    handleRemoveFromCart,
+    isLoginVisible,
+    setIsLoginVisible,
+    handleLogin,
+    product,
+    quantityInCart,
+  } = useProductDetails(props);
 
   return (
     <View style={styles.container}>
+      <Header
+        iconColor="black"
+        onBackPress={() => props.navigation.goBack()}
+        headerStyle={styles.headerStyle}
+        iconStyle={styles.iconStyle}
+      />
       <ScrollView>
         <Image
           source={{ uri: product.image }}
@@ -116,6 +100,12 @@ const ProductDetails: React.FC<ProductDetailsNavigationProp> = props => {
           ) : null}
         </View>
       </ScrollView>
+      <LoginModel
+        visible={isLoginVisible}
+        onClose={() => setIsLoginVisible(false)}
+        onLogin={handleLogin}
+        isLoading={false}
+      />
     </View>
   );
 };
@@ -154,32 +144,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
   },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
-    color: '#333',
-  },
   addToCartContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 16,
     borderTopWidth: 1,
     borderTopColor: '#eee',
-  },
-  addToCartButton: {
-    backgroundColor: palette.primaryGreen,
-    paddingVertical: 16,
-    borderRadius: 8,
-  },
-  addToCartButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
   },
   quantityContainer: {
     width: 40,
@@ -208,6 +178,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 14,
     color: '#666',
+  },
+  headerStyle: {
+    backgroundColor: 'transparent',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+  },
+  iconStyle: {
+    backgroundColor: palette.white,
+    borderRadius: 20,
+    padding: 5,
   },
 });
 

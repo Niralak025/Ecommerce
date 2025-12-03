@@ -5,5 +5,8 @@ export const palette = {
   textMuted: '#6B7280',
   primaryGreen: '#004225',
   white: '#FFFFFF',
-  red:'#F44336',
+  gray:'#6B7280',
+  black:'#111827',
+  error:'#F44336',
+  cancel:'#c3c4c9ff',
 };

@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import React from 'react';
+import { Alert, StyleSheet, TextInput, View } from 'react-native';
 import { palette } from '../../../shared/theme';
 import Button from '../../../components/common/button/Button';
 import Header from '../../../components/common/header/Header';
@@ -8,24 +8,11 @@ import useLoginViewModel from './LoginViewModel';
 const LoginView: React.FC = (props: any) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const { handleLogin, checkAuthStatus, isLoading } = useLoginViewModel(
-    props.navigation,
-  );
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const isAuthenticated = await checkAuthStatus();
-      if (isAuthenticated) {
-        props.navigation.replace('MainTabs');
-      }
-    };
-    checkAuth();
-  }, [checkAuthStatus, props.navigation]);
+  const { handleLogin } = useLoginViewModel(props.navigation);
 
   const handleSubmit = () => {
-    console.log('handleSubmit');
-
     if (!email || !password) {
+      Alert.alert('Login', 'Please fill email and password.');
       return;
     }
     handleLogin(email, password);
@@ -51,13 +38,6 @@ const LoginView: React.FC = (props: any) => {
           title="Login"
           onPress={() => {
             handleSubmit();
-          }}
-          buttonStyle={styles.button}
-        />
-        <Button
-          title="Signup"
-          onPress={() => {
-            props.navigation.navigate('Signup');
           }}
           buttonStyle={styles.button}
         />

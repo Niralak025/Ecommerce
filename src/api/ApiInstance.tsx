@@ -1,6 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { Alert } from 'react-native';
+import { store } from '../redux/store';
 
 const productionUrl = '';
 const localUrl = 'https://fakestoreapi.com/';
@@ -13,7 +13,7 @@ const axiosInstance = axios.create({
 // ✅ Always attach latest access token
 axiosInstance.interceptors.request.use(
   async config => {
-    const token = await AsyncStorage.getItem('access_token');
+    const token = store.getState().auth.token;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -40,10 +40,7 @@ axiosInstance.interceptors.request.use(
   },
 );
 
-// ✅ Manage refresh state
-let isRefreshing = false;
-
-// ✅ Response interceptor with retry
+// ✅ Response interceptor
 axiosInstance.interceptors.response.use(
   (response): any => {
     if (__DEV__) {
@@ -69,37 +66,8 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    const originalRequest = error.config;
     const { status } = error.response;
-    if (__DEV__) {
-      console.log(
-        '%c❌ [API Error Response]',
-        'color:#ff4d4d;font-weight:bold;',
-        {
-          url: originalRequest?.url,
-          status,
-          headers: error.response.headers,
-          data: error.response.data,
-        },
-      );
-    }
-
-    if (status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      const currentRefreshToken = await AsyncStorage.getItem('refresh_token');
-      if (!currentRefreshToken) {
-        return Promise.reject(error);
-      }
-      if (isRefreshing) {
-        // Wait for refresh to complete
-        return new Promise(function (resolve, reject) {}).then(token => {
-          originalRequest.headers.Authorization = 'Bearer ' + token;
-          return axiosInstance(originalRequest);
-        });
-      }
-      isRefreshing = true;
-    }
-
+    
     // Handle server error
     if (status === 500) {
       Alert.alert(
@@ -108,7 +76,6 @@ axiosInstance.interceptors.response.use(
         [{ text: 'OK' }],
       );
     }
-
     return Promise.reject(error);
   },
 );

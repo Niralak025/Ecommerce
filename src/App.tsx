@@ -17,6 +17,7 @@ import RootNavigator from './navigators/RootNavigator';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistor, store } from './redux/store';
 import { NavigationContainer } from '@react-navigation/native';
+import { palette } from './shared/theme';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -47,7 +48,7 @@ function AppContent() {
       <Loader
         fullScreen={true}
         size="large"
-        color="#0000ff"
+        color={palette.primaryGreen}
         isLoading={isLoading}
       />
     </SafeAreaView>

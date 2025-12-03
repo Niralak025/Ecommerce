@@ -27,8 +27,6 @@ const OrderHistory: React.FC<OrderListingProps> = props => {
   useEffect(() => {
     const loadOrders = async () => {
       const savedOrders = await getOrders();
-      console.log('🚀 ~ useEffect ~ savedOrders:', savedOrders);
-
       setOrdersList(savedOrders);
     };
 
@@ -39,9 +37,7 @@ const OrderHistory: React.FC<OrderListingProps> = props => {
     <TouchableOpacity style={styles.orderCard} onPress={() => {}}>
       <View style={styles.orderHeader}>
         <View>
-          <AppText style={styles.orderNumber}>
-            Order #{item.id}
-          </AppText>
+          <AppText style={styles.orderNumber}>Order #{item.id}</AppText>
           <AppText style={styles.orderDate}>
             {new Date(item.order_date).toLocaleDateString('en-US', {
               year: 'numeric',
