@@ -27,12 +27,14 @@ const LoginView: React.FC = (props: any) => {
           style={styles.input}
           onChangeText={setEmail}
           value={email}
+          placeholderTextColor={palette.textMuted}
         />
         <TextInput
           placeholder="Password"
           style={styles.input}
           onChangeText={setPassword}
           value={password}
+          placeholderTextColor={palette.textMuted}
         />
         <Button
           title="Login"

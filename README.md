@@ -89,3 +89,70 @@ src/
    API_BASE_URL=your_api_url_here
    # Add other environment variables as needed
    ```
+
+## 🛠 Build Instructions
+
+### Android Builds
+
+#### Debug Build
+```bash
+# Create debug APK
+cd android && ./gradlew assembleDebug
+# The APK will be available at:
+# android/app/build/outputs/apk/debug/app-debug.apk
+
+# Or install directly on a connected device/emulator
+npm run android
+# OR
+yarn android
+```
+
+#### Release Build
+```bash
+# 1. Generate a keystore (first time only)
+keytool -genkey -v -keystore my-release-key.keystore -alias my-key-alias -keyalg RSA -keysize 2048 -validity 10000
+
+# 2. Configure signing in android/app/build.gradle
+#    Add signingConfigs and buildTypes.release section
+
+# 3. Create release bundle
+cd android && ./gradlew bundleRelease
+# The AAB will be available at:
+# android/app/build/outputs/bundle/release/app-release.aab
+
+# OR create release APK
+cd android && ./gradlew assembleRelease
+# The APK will be available at:
+# android/app/build/outputs/apk/release/app-release.apk
+```
+
+### iOS Builds
+
+#### Debug Build
+```bash
+# Open the workspace in Xcode
+open ios/Ecommerce.xcworkspace
+
+# In Xcode:
+# 1. Select 'Ecommerce' in the project navigator
+# 2. Select your target
+# 3. Select 'Any iOS Device' as the build target
+# 4. Click 'Product' > 'Build' (⌘B)
+```
+
+#### Release Build
+```bash
+# 1. Update version and build number in Xcode
+#    - Open ios/Ecommerce.xcworkspace
+#    - Select project > Target > General
+#    - Update Version and Build number
+
+# 2. Create archive
+#    - In Xcode, select 'Any iOS Device' as build target
+#    - Click 'Product' > 'Archive'
+
+# 3. After archiving, the Organizer window will open
+#    - Select the archive
+#    - Click 'Distribute App'
+#    - Follow the prompts to create an .ipa file
+```
